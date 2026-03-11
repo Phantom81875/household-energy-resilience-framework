@@ -7,8 +7,8 @@ This project develops a data-driven framework to help households prepare for ele
 The system analyzes grid and weather data, models household energy usage, and optimizes battery allocation to maximize survival time during outages.
 
 Team:
-Safeer – Project Lead / Power Systems Modelling
-Jola – Optimization Algorithms
-Jujhar – Data Engineering & Code support
-Light – Prediction Models and Code Lead
-Miley – Visualization and Analysis 
+(Safeer – Project Lead / Power Systems Modelling)
+(Jola – Optimization Algorithms)
+(Jujhar – Data Engineering & Code support)
+(Light – Prediction Models and Code Lead)
+(Miley – Visualization and Analysis)
