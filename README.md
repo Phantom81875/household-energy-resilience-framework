@@ -8,7 +8,4 @@ The system analyzes grid and weather data, models household energy usage, and op
 
 Team:
 (Safeer – Project Lead / Power Systems Modelling)
-(Jola – Optimization Algorithms)
-(Jujhar – Data Engineering & Code support)
-(Light – Prediction Models and Code Lead)
 (Miley – Visualization and Analysis)
