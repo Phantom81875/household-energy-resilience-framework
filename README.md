@@ -8,6 +8,6 @@ The system analyzes grid and weather data, models household energy usage, and op
 
 Team:
 (Safeer – Project Lead / Power Systems Modelling)
-(Miley – Visualization and Analysis)
+(Kovorah – Visualization and Analysis)
 (CaptainMayer — Core Logic Development)
 (sage — Optimization + System Logic)
