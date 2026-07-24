@@ -1,0 +1,345 @@
+[
+    {
+        "Appliance": "Refrigerator",
+        "Category": "Kitchen",
+        "Average_Wattage": "180",
+        "Essential": "Yes",
+        "Priority": "5"
+    },
+    {
+        "Appliance": "Microwave",
+        "Category": "Kitchen",
+        "Average_Wattage": "1000",
+        "Essential": "No",
+        "Priority": "2"
+    },
+    {
+        "Appliance": "LED Light Bulb",
+        "Category": "Lighting",
+        "Average_Wattage": "10",
+        "Essential": "Yes",
+        "Priority": "4"
+    },
+    {
+        "Appliance": "Wi-Fi Router",
+        "Category": "Networking",
+        "Average_Wattage": "15",
+        "Essential": "Yes",
+        "Priority": "4"
+    },
+    {
+        "Appliance": "Television",
+        "Category": "Entertainment",
+        "Average_Wattage": "100",
+        "Essential": "No",
+        "Priority": "1"
+    },
+    {
+        "Appliance": "Laptop",
+        "Category": "Electronics",
+        "Average_Wattage": "60",
+        "Essential": "Yes",
+        "Priority": "3"
+    },
+    {
+        "Appliance": "Dishwasher",
+        "Category": "Kitchen",
+        "Average_Wattage": "1500",
+        "Essential": "No",
+        "Priority": "1"
+    },
+    {
+        "Appliance": "CFL Light Bulb",
+        "Category": "Lighting",
+        "Average_Wattage": "15",
+        "Essential": "Yes",
+        "Priority": "4"
+    },
+    {
+        "Appliance": "Ceiling Fan",
+        "Category": "Cooling",
+        "Average_Wattage": "50",
+        "Essential": "Yes",
+        "Priority": "3"
+    },
+    {
+        "Appliance": "Internet Modem",
+        "Category": "Networking",
+        "Average_Wattage": "10",
+        "Essential": "Yes",
+        "Priority": "4"
+    },
+    {
+        "Appliance": "Electric Oven",
+        "Category": "Kitchen",
+        "Average_Wattage": "2400",
+        "Essential": "No",
+        "Priority": "1"
+    },
+    {
+        "Appliance": "Rice cooker ",
+        "Category": "Kitchen",
+        "Average_Wattage": "700",
+        "Essential": "No",
+        "Priority": "2"
+    },
+    {
+        "Appliance": "Blender",
+        "Category": "Kitchen",
+        "Average_Wattage": "500",
+        "Essential": "No",
+        "Priority": "1"
+    },
+    {
+        "Appliance": "Freezer",
+        "Category": "Kitchen",
+        "Average_Wattage": "120",
+        "Essential": "Yes",
+        "Priority": "5"
+    },
+    {
+        "Appliance": "Nebulizer",
+        "Category": "Medical",
+        "Average_Wattage": "80",
+        "Essential": "Yes",
+        "Priority": "5"
+    },
+    {
+        "Appliance": "E. toothbrush ",
+        "Category": "Personal care",
+        "Average_Wattage": "2",
+        "Essential": "No",
+        "Priority": "1"
+    },
+    {
+        "Appliance": "Gaming Console",
+        "Category": "Entertainment",
+        "Average_Wattage": "180",
+        "Essential": "No",
+        "Priority": "1"
+    },
+    {
+        "Appliance": "Vaccum cleaner",
+        "Category": "Cleaning",
+        "Average_Wattage": "900",
+        "Essential": "No",
+        "Priority": "1"
+    },
+    {
+        "Appliance": "O. Concentrator",
+        "Category": "Medical",
+        "Average_Wattage": "400",
+        "Essential": "Yes",
+        "Priority": "5"
+    },
+    {
+        "Appliance": "Printer",
+        "Category": "Office",
+        "Average_Wattage": "50",
+        "Essential": "No",
+        "Priority": "1"
+    },
+    {
+        "Appliance": "Clock radio",
+        "Category": "Bedroom",
+        "Average_Wattage": "5",
+        "Essential": "No",
+        "Priority": "2"
+    },
+    {
+        "Appliance": "Soundbar",
+        "Category": "Entertainment",
+        "Average_Wattage": "40",
+        "Essential": "No",
+        "Priority": "1"
+    },
+    {
+        "Appliance": "Washing machine",
+        "Category": "Laundry",
+        "Average_Wattage": "500",
+        "Essential": "No",
+        "Priority": "1"
+    },
+    {
+        "Appliance": "Space Heater",
+        "Category": "Heating",
+        "Average_Wattage": "1500",
+        "Essential": "Yes",
+        "Priority": "3"
+    },
+    {
+        "Appliance": "Electric Water Heater",
+        "Category": "Heating",
+        "Average_Wattage": "4500",
+        "Essential": "No",
+        "Priority": "2"
+    },
+    {
+        "Appliance": "Gas Furnace Blower Fan",
+        "Category": "Heating",
+        "Average_Wattage": "600",
+        "Essential": "Yes",
+        "Priority": "5"
+    },
+    {
+        "Appliance": "CPAP Machine",
+        "Category": "Medical",
+        "Average_Wattage": "50",
+        "Essential": "Yes",
+        "Priority": "5"
+    },
+    {
+        "Appliance": "Mini Fridge (medication storage)",
+        "Category": "Medical",
+        "Average_Wattage": "70",
+        "Essential": "Yes",
+        "Priority": "5"
+    },
+    {
+        "Appliance": "Electric Wheelchair/Scooter charger",
+        "Category": "Medical",
+        "Average_Wattage": "150",
+        "Essential": "Yes",
+        "Priority": "5"
+    },
+    {
+        "Appliance": "Sump Pump (1/3 HP)",
+        "Category": "Water/Utility",
+        "Average_Wattage": "800",
+        "Essential": "Yes",
+        "Priority": "5"
+    },
+    {
+        "Appliance": "Well Pump (3/4 HP)",
+        "Category": "Water/Utility",
+        "Average_Wattage": "1000",
+        "Essential": "Yes",
+        "Priority": "5"
+    },
+    {
+        "Appliance": "Window A.C Unit (8,000-10,000 BTU",
+        "Category": "Cooling",
+        "Average_Wattage": "900",
+        "Essential": "Yes",
+        "Priority": "3"
+    },
+    {
+        "Appliance": "Dehumidifier",
+        "Category": "Cooling",
+        "Average_Wattage": "300",
+        "Essential": "No",
+        "Priority": "2"
+    },
+    {
+        "Appliance": "Box Fan",
+        "Category": "Cooling",
+        "Average_Wattage": "100",
+        "Essential": "Yes",
+        "Priority": "3"
+    },
+    {
+        "Appliance": "Coffee Maker",
+        "Category": "Kitchen",
+        "Average_Wattage": "900",
+        "Essential": "No",
+        "Priority": "1"
+    },
+    {
+        "Appliance": "Electric Kettle",
+        "Category": "Kitchen",
+        "Average_Wattage": "1500",
+        "Essential": "No",
+        "Priority": "2"
+    },
+    {
+        "Appliance": "Toaster",
+        "Category": "Kitchen",
+        "Average_Wattage": "850",
+        "Essential": "No",
+        "Priority": "1"
+    },
+    {
+        "Appliance": "Slow Cooker",
+        "Category": "Kitchen",
+        "Average_Wattage": "200",
+        "Essential": "No",
+        "Priority": "2"
+    },
+    {
+        "Appliance": "Air Fryer",
+        "Category": "Kitchen",
+        "Average_Wattage": "1500",
+        "Essential": "No",
+        "Priority": "1"
+    },
+    {
+        "Appliance": "Water cooler/dispenser",
+        "Category": "Kitchen",
+        "Average_Wattage": "100",
+        "Essential": "No",
+        "Priority": "1"
+    },
+    {
+        "Appliance": "Garage Door Opener",
+        "Category": "Utility",
+        "Average_Wattage": "350",
+        "Essential": "No",
+        "Priority": "2"
+    },
+    {
+        "Appliance": "Home security/alarm panel",
+        "Category": "Utility",
+        "Average_Wattage": "15",
+        "Essential": "Yes",
+        "Priority": "3"
+    },
+    {
+        "Appliance": "Cordless Phone/VoIP Base",
+        "Category": "Communication",
+        "Average_Wattage": "5",
+        "Essential": "Yes",
+        "Priority": "4"
+    },
+    {
+        "Appliance": "Desktop Computer",
+        "Category": "Electronics",
+        "Average_Wattage": "200",
+        "Essential": "No",
+        "Priority": "2"
+    },
+    {
+        "Appliance": "Computer Monitor",
+        "Category": "Electronics",
+        "Average_Wattage": "30",
+        "Essential": "No",
+        "Priority": "2"
+    },
+    {
+        "Appliance": "Hair Dryer",
+        "Category": "Personal care",
+        "Average_Wattage": "1500",
+        "Essential": "No",
+        "Priority": "1"
+    },
+    {
+        "Appliance": "Electric Blanket",
+        "Category": "Bedroom",
+        "Average_Wattage": "200",
+        "Essential": "Yes",
+        "Priority": "4"
+    },
+    {
+        "Appliance": "Baby Monitor",
+        "Category": "Bedroom",
+        "Average_Wattage": "3",
+        "Essential": "Yes",
+        "Priority": "4"
+    },
+    {
+        "Appliance": "Smoke/CO Detector (hardwired, battery backup)",
+        "Category": "Safety",
+        "Average_Wattage": "1",
+        "Essential": "Yes",
+        "Priority": "5"
+    }
+]
