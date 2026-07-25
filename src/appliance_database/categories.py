@@ -5,4 +5,4 @@ def get_categories(database):
     for appliance in database.values():
         categories.add(appliance["category"])
 
-    return sorted(categories)
+    return categories
