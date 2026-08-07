@@ -18,13 +18,14 @@ def load_appliance_database():
 
     for appliance in appliances:
 
-        name = appliance["Appliance"]
+        name = appliance["appliance"]
 
         database[name] = {
-            "category": appliance["Category"],
-            "wattage": int(appliance["Average_Wattage"]),
-            "priority": int(appliance["Priority"]),
-            "essential": appliance["Essential"] == "Yes"
+            "category": appliance["category"],
+            "wattage": int(appliance["wattage"]),
+            "priority": int(appliance["priority"]),
+            "usage": appliance['usage'],
+            "essential": appliance["essential"] == "Yes",
         }
 
     return database
