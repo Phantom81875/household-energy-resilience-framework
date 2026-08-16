@@ -85,10 +85,10 @@ def households(request):
         )
 @api_view(["PATCH", "GET", "DELETE"])
 @permission_classes([IsAuthenticated])
-def households_id(request, id):
+def households_id(request, household_id):
     house = get_object_or_404(
         models.Household,
-        id=id,
+        id=household_id,
         owner=request.user
     )
 
@@ -123,10 +123,10 @@ def households_id(request, id):
 
 @api_view(["PATCH"])
 @permission_classes([IsAuthenticated])
-def household_id_select(request, id):
+def household_id_select(request, household_id):
     house = get_object_or_404(
         models.Household,
-        id=id,
+        id=household_id,
         owner=request.user
     )
     active_household = request.user.activehousehold
@@ -147,10 +147,10 @@ def household_active(request):
 
 @api_view(["POST", "GET"])
 @permission_classes([IsAuthenticated])
-def appliances(request, id):
+def appliances(request, household_id):
     house = get_object_or_404(
         models.Household,
-        id=id,
+        id=household_id,
         owner=request.user
     )
     if request.method == "GET":
@@ -173,17 +173,17 @@ def appliances(request, id):
         )
 @api_view(["PATCH", "GET", "DELETE"])
 @permission_classes([IsAuthenticated])
-def appliances_id(request, id1, id2):
+def appliances_id(request, household_id, appliance_id):
     house = get_object_or_404(
         models.Household,
-        id=id1,
+        id=household_id,
         owner=request.user
     )
 
     appliance = get_object_or_404(
         models.Appliance,
         household=house,
-        id=id2       
+        id=appliance_id       
     )
 
     if request.method == "GET":
@@ -201,3 +201,89 @@ def appliances_id(request, id1, id2):
     elif request.method == "DELETE":
         appliance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+@api_view(["POST", "GET"])
+@permission_classes([IsAuthenticated])
+def batteries(request, household_id):
+    house = get_object_or_404(
+        models.Household,
+        id=household_id,
+        owner=request.user
+    )
+    if request.method == "GET":
+        batteries = house.batteries.all()
+        serializer = serializers.BatterySerializer(batteries, many=True)
+
+        return Response(serializer.data)
+    elif request.method == "POST":
+        serializer = serializers.BatterySerializer(data=request.data)
+
+        if serializer.is_valid():
+            battery = serializer.save(household=house)
+            return Response(
+                    {"message": f"Succefully created Battery {battery.name}"},
+                    status=status.HTTP_201_CREATED
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+@api_view(["PATCH", "GET", "DELETE"])
+@permission_classes([IsAuthenticated])
+def batteries_id(request, household_id, battery_id):
+    house = get_object_or_404(
+        models.Household,
+        id=household_id,
+        owner=request.user
+    )
+
+    battery = get_object_or_404(
+        models.Battery,
+        household=house,
+        id=battery_id       
+    )
+
+    if request.method == "GET":
+        serializer = serializers.BatterySerializer(battery)
+        return Response(serializer.data)
+    elif request.method == "PATCH":
+        serializer = serializers.BatterySerializer(battery, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    elif request.method == "DELETE":
+        battery.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(["PATCH", "GET"])
+@permission_classes([IsAuthenticated])
+def energysupply_id(request, household_id):
+    house = get_object_or_404(
+        models.Household,
+        id=household_id,
+        owner=request.user
+    )
+    energysupply = get_object_or_404(
+        models.EnergySupply,
+        household = house
+    )
+    if request.method == "PATCH":
+        serializer = serializers.EnergySupplySerializer(energysupply, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+            )
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    elif request.method == "GET":
+        serializer = serializers.EnergySupplySerializer(energysupply)
+        return Response(serializer.data)

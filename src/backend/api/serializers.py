@@ -49,4 +49,16 @@ class ApplianceSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Appliance
         fields = ["id", "name", "category", "wattage", "priority", "usage", "active"]
+    # TO-DO: add validation
+        
+class BatterySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Battery
+        fields = ["id", "name", "capacity", "current_percentage", "efficiency", "max_discharge", "active"]
+    # TO-DO: add validation
+
+class EnergySupplySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.EnergySupply
+        fields = ["id", "wattage"]
         

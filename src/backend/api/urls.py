@@ -13,9 +13,12 @@ urlpatterns = [
     path('check/username/', views.check_username),
     path('check/password/', views.check_password),
     path('households/', views.households),
-    path('households/<int:id>/', views.households_id),
-    path('households/<int:id>/select/', views.household_id_select),
+    path('households/<int:household_id>/', views.households_id),
+    path('households/<int:household_id>/select/', views.household_id_select),
     path('households/active/', views.household_active),
-    path('households/<int:id>/appliances/', views.appliances),
-    path('households/<int:id1>/appliances/<int:id2>/', views.appliances_id),
+    path('households/<int:household_id>/appliances/', views.appliances),
+    path('households/<int:household_id>/appliances/<int:appliance_id>/', views.appliances_id),
+    path('households/<int:household_id>/batteries/', views.batteries),
+    path('households/<int:household_id>/batteries/<int:battery_id>/', views.batteries_id),
+    path('households/<int:household_id>/energysupply/', views.energysupply_id)
 ]
