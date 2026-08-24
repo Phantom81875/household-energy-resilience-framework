@@ -1,82 +1,154 @@
 import { useState } from "react";
-import "./App.css";
+import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
+
+import Dashboard from "./pages/Dashboard";
+import Simulator from "./pages/Simulator";
+import Optimization from "./pages/Optimization";
+import Household from "./pages/Household";
 import Signup from "./Signup";
 
-function Login({ onSignup }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+import "./App.css";
 
-  function handleSubmit(event) {
-    event.preventDefault();
+function App() {
+  const [authenticated, setAuthenticated] = useState(
+    Boolean(localStorage.getItem("access_token"))
+  );
 
-    console.log({
-      email,
-      password,
-    });
+  function handleLogin() {
+    setAuthenticated(true);
+  }
+
+  function handleLogout() {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    setAuthenticated(false);
+  }
+
+  if (!authenticated) {
+    return <Signup onLogin={handleLogin} />;
   }
 
   return (
-    <div className="login-page">
-      <div className="login-card">
-        
+    <BrowserRouter>
+      <div className="app">
 
-        <h1>Welcome back</h1>
+        {/* Sidebar */}
+        <aside className="sidebar">
 
-        <p className="subtitle">
-          Log in to your household energy account.
-        </p>
+          <div className="logo">
+            <div className="logo-mark">H</div>
 
-        <form onSubmit={handleSubmit}>
-          <label>Email</label>
+            <div>
+              <h2>EnergyResilience</h2>
+              <span>Household Energy</span>
+            </div>
+          </div>
 
-          <input
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
+          <nav className="navigation">
 
-          <label>Password</label>
+            <NavLink
+              to="/"
+              end
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              <span>⌂</span>
+              Dashboard
+            </NavLink>
 
-          <input
-            type="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
+            <NavLink
+              to="/simulator"
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              <span>▣</span>
+              Simulator
+            </NavLink>
 
-          <button type="submit">
-            Log in
-          </button>
-        </form>
+            <NavLink
+              to="/optimization"
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              <span>⚡</span>
+              Optimization
+            </NavLink>
 
-        <p className="signup-text">
-          Don't have an account?{" "}
-          <a
-            href="#"
-            onClick={(event) => {
-              event.preventDefault();
-              onSignup();
-            }}
-          >
-            Sign up
-          </a>
-        </p>
+            <NavLink
+              to="/household"
+              className={({ isActive }) =>
+                isActive ? "nav-link active" : "nav-link"
+              }
+            >
+              <span>⚙</span>
+              Household
+            </NavLink>
+
+          </nav>
+
+          <div className="sidebar-bottom">
+            <div className="user-card">
+
+              <div className="user-avatar">
+                U
+              </div>
+
+              <div>
+                <strong>User</strong>
+                <span>Household</span>
+              </div>
+
+            </div>
+
+            <button
+              className="secondary-button"
+              onClick={handleLogout}
+              style={{
+                width: "100%",
+                marginTop: "14px",
+              }}
+            >
+              Log out
+            </button>
+          </div>
+
+        </aside>
+
+        {/* Main content */}
+        <main className="main-content">
+
+          <Routes>
+
+            <Route
+              path="/"
+              element={<Dashboard />}
+            />
+
+            <Route
+              path="/simulator"
+              element={<Simulator />}
+            />
+
+            <Route
+              path="/optimization"
+              element={<Optimization />}
+            />
+
+            <Route
+              path="/household"
+              element={<Household />}
+            />
+
+          </Routes>
+
+        </main>
+
       </div>
-    </div>
+    </BrowserRouter>
   );
-}
-
-function App() {
-  const [page, setPage] = useState("login");
-
-  if (page === "signup") {
-    return <Signup onLogin={() => setPage("login")} />;
-  }
-
-  return <Login onSignup={() => setPage("signup")} />;
 }
 
 export default App;

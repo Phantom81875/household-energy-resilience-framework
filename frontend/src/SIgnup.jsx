@@ -1,95 +1,394 @@
 import { useState } from "react";
 import "./App.css";
+import API from "../api/api";
 
 function Signup({ onLogin }) {
+  const [mode, setMode] = useState("signup");
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  function handleSubmit(event) {
-    event.preventDefault();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
+  function switchMode(newMode) {
+    setMode(newMode);
+    setError("");
+    setSuccess("");
+    setPassword("");
+    setConfirmPassword("");
+  }
+
+  function getErrorMessage(data) {
+    const messages = [];
+
+    if (data && typeof data === "object") {
+      Object.entries(data).forEach(([field, errors]) => {
+        if (Array.isArray(errors)) {
+          errors.forEach((message) => {
+            messages.push(
+              typeof message === "string"
+                ? message
+                : JSON.stringify(message)
+            );
+          });
+        } else if (typeof errors === "string") {
+          messages.push(errors);
+        }
+      });
+    }
+
+    return messages.length > 0
+      ? messages.join(" ")
+      : "Something went wrong. Please try again.";
+  }
+
+  async function handleSignup() {
     if (password !== confirmPassword) {
-      alert("Passwords do not match.");
+      setError("Passwords do not match.");
       return;
     }
 
-    console.log({
-      username,
-      email,
-      password,
-    });
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      /*
+       * Django endpoint:
+       *
+       * POST /api/register/
+       *
+       * API baseURL should be:
+       * http://127.0.0.1:8000/api
+       */
+      const response = await API.post("/register/", {
+        username,
+        email,
+        password,
+      });
+
+      console.log("Registration successful:", response.data);
+
+      setSuccess(
+        response.data?.message ||
+          "Account created successfully!"
+      );
+
+      /*
+       * Your register endpoint creates the user and
+       * household, but does not return JWT tokens.
+       *
+       * Therefore, send the user to the login screen.
+       */
+      setTimeout(() => {
+        setMode("login");
+        setSuccess("");
+        setConfirmPassword("");
+        setPassword("");
+      }, 800);
+    } catch (error) {
+      console.error(
+        "Registration request failed:",
+        error.response?.data || error
+      );
+
+      if (error.response?.data) {
+        setError(
+          getErrorMessage(error.response.data)
+        );
+      } else {
+        setError(
+          "Could not connect to the server. Please make sure the backend is running."
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
   }
+
+  async function handleLogin() {
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      /*
+       * Django endpoint:
+       *
+       * POST /api/login/
+       *
+       * TokenObtainPairView returns:
+       *
+       * {
+       *   "refresh": "...",
+       *   "access": "..."
+       * }
+       */
+      const response = await API.post("/login/", {
+        username,
+        password,
+      });
+
+      const data = response.data;
+
+      console.log("Login successful:", data);
+
+      if (data.access) {
+        localStorage.setItem(
+          "access_token",
+          data.access
+        );
+      }
+
+      if (data.refresh) {
+        localStorage.setItem(
+          "refresh_token",
+          data.refresh
+        );
+      }
+
+      if (!data.access) {
+        setError(
+          "Login succeeded, but the server did not return an access token."
+        );
+        return;
+      }
+
+      onLogin();
+    } catch (error) {
+      console.error(
+        "Login request failed:",
+        error.response?.data || error
+      );
+
+      if (error.response?.data) {
+        setError(
+          getErrorMessage(error.response.data)
+        );
+      } else {
+        setError(
+          "Could not connect to the server. Please make sure the backend is running."
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    if (mode === "signup") {
+      await handleSignup();
+    } else {
+      await handleLogin();
+    }
+  }
+
+  const isSignup = mode === "signup";
 
   return (
     <div className="login-page">
       <div className="login-card">
 
-        <h1>Create account</h1>
+        <h1>
+          {isSignup
+            ? "Create account"
+            : "Welcome back"}
+        </h1>
 
         <p className="subtitle">
-          Create your household energy account.
+          {isSignup
+            ? "Create your household energy account."
+            : "Log in to your household energy account."}
         </p>
 
         <form onSubmit={handleSubmit}>
-          <label>Username</label>
+
+          {/* =========================
+              SIGNUP FIELDS
+          ========================= */}
+
+          {isSignup && (
+            <>
+              <label htmlFor="username">
+                Username
+              </label>
+
+              <input
+                id="username"
+                type="text"
+                placeholder="Choose a username"
+                value={username}
+                onChange={(event) =>
+                  setUsername(event.target.value)
+                }
+                required
+              />
+
+              <label htmlFor="email">
+                Email
+              </label>
+
+              <input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(event) =>
+                  setEmail(event.target.value)
+                }
+                required
+              />
+            </>
+          )}
+
+          {/* =========================
+              LOGIN USERNAME
+          ========================= */}
+
+          {!isSignup && (
+            <>
+              <label htmlFor="login-username">
+                Username
+              </label>
+
+              <input
+                id="login-username"
+                type="text"
+                placeholder="Enter your username"
+                value={username}
+                onChange={(event) =>
+                  setUsername(event.target.value)
+                }
+                required
+              />
+            </>
+          )}
+
+          {/* =========================
+              PASSWORD
+          ========================= */}
+
+          <label htmlFor="password">
+            Password
+          </label>
 
           <input
-            type="text"
-            placeholder="Choose a username"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-            required
-          />
-
-          <label>Email</label>
-
-          <input
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-
-          <label>Password</label>
-
-          <input
+            id="password"
             type="password"
-            placeholder="Create a password"
+            placeholder={
+              isSignup
+                ? "Create a password"
+                : "Enter your password"
+            }
             value={password}
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(event) =>
+              setPassword(event.target.value)
+            }
             required
           />
 
-          <label>Confirm password</label>
+          {/* =========================
+              CONFIRM PASSWORD
+          ========================= */}
 
-          <input
-            type="password"
-            placeholder="Confirm your password"
-            value={confirmPassword}
-            onChange={(event) => setConfirmPassword(event.target.value)}
-            required
-          />
+          {isSignup && (
+            <>
+              <label htmlFor="confirm-password">
+                Confirm password
+              </label>
 
-          <button type="submit">
-            Create account
+              <input
+                id="confirm-password"
+                type="password"
+                placeholder="Confirm your password"
+                value={confirmPassword}
+                onChange={(event) =>
+                  setConfirmPassword(event.target.value)
+                }
+                required
+              />
+            </>
+          )}
+
+          {/* =========================
+              MESSAGES
+          ========================= */}
+
+          {error && (
+            <p className="form-error">
+              {error}
+            </p>
+          )}
+
+          {success && (
+            <p className="form-success">
+              {success}
+            </p>
+          )}
+
+          {/* =========================
+              SUBMIT
+          ========================= */}
+
+          <button
+            type="submit"
+            disabled={loading}
+          >
+            {loading
+              ? isSignup
+                ? "Creating account..."
+                : "Logging in..."
+              : isSignup
+                ? "Create account"
+                : "Log in"}
           </button>
+
         </form>
 
+        {/* =========================
+            SWITCH LOGIN / SIGNUP
+        ========================= */}
+
         <p className="signup-text">
-          Already have an account?{" "}
-          <a
-            href="#"
-            onClick={(event) => {
-              event.preventDefault();
-              onLogin();
-            }}
-          >
-            Log in
-          </a>
+
+          {isSignup ? (
+            <>
+              Already have an account?{" "}
+
+              <a
+                href="#"
+                onClick={(event) => {
+                  event.preventDefault();
+                  switchMode("login");
+                }}
+              >
+                Log in
+              </a>
+            </>
+          ) : (
+            <>
+              Don't have an account?{" "}
+
+              <a
+                href="#"
+                onClick={(event) => {
+                  event.preventDefault();
+                  switchMode("signup");
+                }}
+              >
+                Create account
+              </a>
+            </>
+          )}
+
         </p>
+
       </div>
     </div>
   );
