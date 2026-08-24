@@ -17,57 +17,106 @@ function Dashboard() {
         setLoading(true);
         setError("");
 
-        // Get active household
+        // --------------------------------
+        // Active household
+        // --------------------------------
+
         const householdResponse = await API.get(
           "/households/active/"
         );
 
-        const household = householdResponse.data;
+        const household =
+          householdResponse.data;
 
         if (!household?.id) {
-          throw new Error("No active household found.");
+          throw new Error(
+            "No active household found."
+          );
         }
 
-        const householdId = household.id;
+        const householdId =
+          household.id;
 
-        // Load all dashboard data
-        const [
-          appliancesResponse,
-          batteriesResponse,
-          energySupplyResponse,
-        ] = await Promise.all([
-          API.get(
+        // --------------------------------
+        // Appliances
+        // --------------------------------
+
+        const appliancesResponse =
+          await API.get(
             `/households/${householdId}/appliances/`
-          ),
-
-          API.get(
-            `/households/${householdId}/batteries/`
-          ),
-
-          API.get(
-            `/households/${householdId}/energy-supply/`
-          ),
-        ]);
+          );
 
         setAppliances(
-          Array.isArray(appliancesResponse.data)
+          Array.isArray(
+            appliancesResponse.data
+          )
             ? appliancesResponse.data
             : []
         );
 
+        // --------------------------------
+        // Batteries
+        // --------------------------------
+
+        const batteriesResponse =
+          await API.get(
+            `/households/${householdId}/batteries/`
+          );
+
         setBattery(
-          Array.isArray(batteriesResponse.data)
+          Array.isArray(
+            batteriesResponse.data
+          )
             ? batteriesResponse.data[0] || null
             : null
         );
 
-        setEnergySupply(
-          energySupplyResponse.data || null
-        );
+        // --------------------------------
+        // Energy Supply
+        //
+        // This record may not exist yet.
+        // The backend returns 404 when it
+        // doesn't exist, so don't let that
+        // break the whole Dashboard.
+        // --------------------------------
+
+        try {
+          const energySupplyResponse =
+            await API.get(
+              `/households/${householdId}/energysupply/`
+            );
+
+          setEnergySupply(
+            energySupplyResponse.data || null
+          );
+        } catch (energySupplyError) {
+          if (
+            energySupplyError.response?.status ===
+            404
+          ) {
+            console.warn(
+              "No EnergySupply is configured for this household."
+            );
+
+            setEnergySupply(null);
+          } else {
+            throw energySupplyError;
+          }
+        }
       } catch (err) {
         console.error(
           "Dashboard API error:",
           err
+        );
+
+        console.error(
+          "Response:",
+          err.response?.data
+        );
+
+        console.error(
+          "Request:",
+          err.config?.url
         );
 
         setError(
@@ -82,41 +131,51 @@ function Dashboard() {
   }, []);
 
   /*
-   * Calculate dashboard energy information.
+   * Calculate dashboard information.
    */
   const energyData = useMemo(() => {
-    const activeAppliances = appliances.filter(
-      (appliance) => appliance.active
-    );
+    const activeAppliances =
+      appliances.filter(
+        (appliance) => appliance.active
+      );
 
-    // -----------------------------
-    // Current active power
-    // -----------------------------
+    // --------------------------------
+    // Current power
+    // --------------------------------
 
-    const power = activeAppliances.reduce(
-      (total, appliance) =>
-        total +
-        Number(appliance.wattage || 0),
-      0
-    );
+    const power =
+      activeAppliances.reduce(
+        (total, appliance) =>
+          total +
+          Number(
+            appliance.wattage || 0
+          ),
+        0
+      );
 
-    // -----------------------------
-    // Estimated daily energy
-    // -----------------------------
+    // --------------------------------
+    // Daily energy
+    // --------------------------------
 
-    const energy = activeAppliances.reduce(
-      (total, appliance) =>
-        total +
-        (
-          Number(appliance.wattage || 0) *
-          Number(appliance.usage || 0)
-        ) / 1000,
-      0
-    );
+    const energy =
+      activeAppliances.reduce(
+        (total, appliance) =>
+          total +
+          (
+            Number(
+              appliance.wattage || 0
+            ) *
+            Number(
+              appliance.usage || 0
+            )
+          ) /
+            1000,
+        0
+      );
 
-    // -----------------------------
+    // --------------------------------
     // Electricity cost
-    // -----------------------------
+    // --------------------------------
 
     const electricityRate =
       ELECTRICITY_RATE;
@@ -124,12 +183,14 @@ function Dashboard() {
     const cost =
       energy * electricityRate;
 
-    // -----------------------------
+    // --------------------------------
     // Battery
-    // -----------------------------
+    // --------------------------------
 
     const capacity =
-      Number(battery?.capacity || 0);
+      Number(
+        battery?.capacity || 0
+      );
 
     const percentage =
       Number(
@@ -142,11 +203,12 @@ function Dashboard() {
       );
 
     const availableBattery =
-      capacity * (percentage / 100);
+      capacity *
+      (percentage / 100);
 
-    // -----------------------------
+    // --------------------------------
     // Battery runtime
-    // -----------------------------
+    // --------------------------------
 
     const runtime =
       power > 0
@@ -157,9 +219,9 @@ function Dashboard() {
           (power / 1000)
         : 0;
 
-    // -----------------------------
+    // --------------------------------
     // Energy supply
-    // -----------------------------
+    // --------------------------------
 
     const supplyWattage =
       Number(
@@ -169,17 +231,18 @@ function Dashboard() {
     const supplyKW =
       supplyWattage / 1000;
 
-    // Don't allow negative remaining capacity
-    const remainingSupply = Math.max(
-      supplyWattage - power,
-      0
-    );
+    const remainingSupply =
+      Math.max(
+        supplyWattage - power,
+        0
+      );
 
-    // Percentage of supply currently used
     const supplyUtilization =
       supplyWattage > 0
         ? Math.min(
-            (power / supplyWattage) * 100,
+            (power /
+              supplyWattage) *
+              100,
             100
           )
         : 0;
@@ -201,6 +264,9 @@ function Dashboard() {
       supplyKW,
       remainingSupply,
       supplyUtilization,
+
+      hasEnergySupply:
+        Boolean(energySupply),
     };
   }, [
     appliances,
@@ -208,13 +274,16 @@ function Dashboard() {
     energySupply,
   ]);
 
-  /*
-   * Loading state
-   */
+  // --------------------------------
+  // Loading
+  // --------------------------------
+
   if (loading) {
     return (
       <div className="page dashboard">
+
         <div className="page-header">
+
           <div>
             <h1>Dashboard</h1>
 
@@ -222,24 +291,31 @@ function Dashboard() {
               Loading household data...
             </p>
           </div>
+
         </div>
+
       </div>
     );
   }
 
-  /*
-   * Error state
-   */
+  // --------------------------------
+  // Error
+  // --------------------------------
+
   if (error) {
     return (
       <div className="page dashboard">
+
         <div className="page-header">
+
           <div>
             <h1>Dashboard</h1>
 
             <p>{error}</p>
           </div>
+
         </div>
+
       </div>
     );
   }
@@ -254,16 +330,22 @@ function Dashboard() {
       <div className="page-header">
 
         <div>
+
           <h1>Dashboard</h1>
 
           <p>
-            Monitor your household energy resilience.
+            Monitor your household
+            energy resilience.
           </p>
+
         </div>
 
         <div className="status-badge">
+
           <span className="status-dot"></span>
+
           System Ready
+
         </div>
 
       </div>
@@ -284,7 +366,10 @@ function Dashboard() {
           </div>
 
           <div className="card-value">
-            {(energyData.power / 1000).toFixed(2)} kW
+            {(
+              energyData.power / 1000
+            ).toFixed(2)}{" "}
+            kW
           </div>
 
           <div className="card-description">
@@ -303,11 +388,21 @@ function Dashboard() {
           </div>
 
           <div className="card-value">
-            {energyData.supplyKW.toFixed(2)} kW
+
+            {energyData.hasEnergySupply
+              ? `${energyData.supplyKW.toFixed(
+                  2
+                )} kW`
+              : "Not configured"}
+
           </div>
 
           <div className="card-description">
-            {energyData.supplyWattage.toLocaleString()} W capacity
+
+            {energyData.hasEnergySupply
+              ? `${energyData.supplyWattage.toLocaleString()} W capacity`
+              : "No energy supply configured"}
+
           </div>
 
         </div>
@@ -322,11 +417,16 @@ function Dashboard() {
           </div>
 
           <div className="card-value">
-            {energyData.percentage.toFixed(0)}%
+            {energyData.percentage.toFixed(
+              0
+            )}%
           </div>
 
           <div className="card-description">
-            {energyData.availableBattery.toFixed(1)} kWh remaining
+            {energyData.availableBattery.toFixed(
+              1
+            )}{" "}
+            kWh remaining
           </div>
 
         </div>
@@ -345,7 +445,11 @@ function Dashboard() {
           </div>
 
           <div className="card-description">
-            At ${energyData.electricityRate.toFixed(2)}/kWh
+            At $
+            {energyData.electricityRate.toFixed(
+              2
+            )}
+            /kWh
           </div>
 
         </div>
@@ -366,11 +470,16 @@ function Dashboard() {
           <div className="section-header">
 
             <div>
-              <h2>Battery Status</h2>
+
+              <h2>
+                Battery Status
+              </h2>
 
               <p>
-                Current household backup capacity
+                Current household backup
+                capacity
               </p>
+
             </div>
 
           </div>
@@ -381,7 +490,10 @@ function Dashboard() {
             <div className="battery-circle">
 
               <strong>
-                {energyData.percentage.toFixed(0)}%
+                {energyData.percentage.toFixed(
+                  0
+                )}
+                %
               </strong>
 
               <span>
@@ -400,7 +512,10 @@ function Dashboard() {
                 </span>
 
                 <strong>
-                  {energyData.capacity.toFixed(1)} kWh
+                  {energyData.capacity.toFixed(
+                    1
+                  )}{" "}
+                  kWh
                 </strong>
 
               </div>
@@ -413,7 +528,10 @@ function Dashboard() {
                 </span>
 
                 <strong>
-                  {energyData.availableBattery.toFixed(1)} kWh
+                  {energyData.availableBattery.toFixed(
+                    1
+                  )}{" "}
+                  kWh
                 </strong>
 
               </div>
@@ -426,7 +544,10 @@ function Dashboard() {
                 </span>
 
                 <strong>
-                  {energyData.efficiency.toFixed(0)}%
+                  {energyData.efficiency.toFixed(
+                    0
+                  )}
+                  %
                 </strong>
 
               </div>
@@ -439,7 +560,10 @@ function Dashboard() {
                 </span>
 
                 <strong>
-                  {energyData.runtime.toFixed(1)} hrs
+                  {energyData.runtime.toFixed(
+                    1
+                  )}{" "}
+                  hrs
                 </strong>
 
               </div>
@@ -464,7 +588,8 @@ function Dashboard() {
               </h2>
 
               <p>
-                Current household consumption
+                Current household
+                consumption
               </p>
 
             </div>
@@ -610,7 +735,10 @@ function Dashboard() {
               </span>
 
               <strong>
-                {energyData.energy.toFixed(1)} kWh
+                {energyData.energy.toFixed(
+                  1
+                )}{" "}
+                kWh
               </strong>
 
             </div>
@@ -623,7 +751,9 @@ function Dashboard() {
               </span>
 
               <strong>
-                ${energyData.cost.toFixed(2)}
+                ${energyData.cost.toFixed(
+                  2
+                )}
               </strong>
 
             </div>
@@ -650,7 +780,8 @@ function Dashboard() {
             </h2>
 
             <p>
-              Current electricity supply capacity.
+              Current electricity supply
+              capacity.
             </p>
 
           </div>
@@ -658,60 +789,92 @@ function Dashboard() {
         </div>
 
 
-        <div className="battery-info">
+        {!energyData.hasEnergySupply ? (
 
-          <div className="info-row">
-
-            <span>
-              Supply Capacity
-            </span>
+          <div className="empty-state">
 
             <strong>
-              {energyData.supplyKW.toFixed(2)} kW
+              Energy supply not configured
             </strong>
+
+            <span>
+              Add an Energy Supply record
+              before viewing supply capacity.
+            </span>
 
           </div>
 
+        ) : (
 
-          <div className="info-row">
+          <div className="battery-info">
 
-            <span>
-              Current Load
-            </span>
+            <div className="info-row">
 
-            <strong>
-              {(energyData.power / 1000).toFixed(2)} kW
-            </strong>
+              <span>
+                Supply Capacity
+              </span>
+
+              <strong>
+                {energyData.supplyKW.toFixed(
+                  2
+                )}{" "}
+                kW
+              </strong>
+
+            </div>
+
+
+            <div className="info-row">
+
+              <span>
+                Current Load
+              </span>
+
+              <strong>
+                {(
+                  energyData.power / 1000
+                ).toFixed(2)}{" "}
+                kW
+              </strong>
+
+            </div>
+
+
+            <div className="info-row">
+
+              <span>
+                Remaining Capacity
+              </span>
+
+              <strong>
+                {(
+                  energyData.remainingSupply /
+                  1000
+                ).toFixed(2)}{" "}
+                kW
+              </strong>
+
+            </div>
+
+
+            <div className="info-row">
+
+              <span>
+                Supply Utilization
+              </span>
+
+              <strong>
+                {energyData.supplyUtilization.toFixed(
+                  0
+                )}
+                %
+              </strong>
+
+            </div>
 
           </div>
 
-
-          <div className="info-row">
-
-            <span>
-              Remaining Capacity
-            </span>
-
-            <strong>
-              {(energyData.remainingSupply / 1000).toFixed(2)} kW
-            </strong>
-
-          </div>
-
-
-          <div className="info-row">
-
-            <span>
-              Supply Utilization
-            </span>
-
-            <strong>
-              {energyData.supplyUtilization.toFixed(0)}%
-            </strong>
-
-          </div>
-
-        </div>
+        )}
 
       </section>
 
@@ -731,7 +894,8 @@ function Dashboard() {
             </h2>
 
             <p>
-              Your household's active appliances
+              Your household's active
+              appliances
             </p>
 
           </div>
@@ -748,7 +912,8 @@ function Dashboard() {
             </strong>
 
             <span>
-              Add appliances in the Simulator.
+              Add appliances in the
+              Simulator.
             </span>
 
           </div>
@@ -757,65 +922,67 @@ function Dashboard() {
 
           <div className="appliance-list">
 
-            {appliances.map((appliance) => {
+            {appliances.map(
+              (appliance) => {
 
-              const wattage =
-                Number(
-                  appliance.wattage || 0
-                );
+                const wattage =
+                  Number(
+                    appliance.wattage || 0
+                  );
 
-              return (
-                <div
-                  className="appliance-row"
-                  key={appliance.id}
-                >
-
-                  <div className="appliance-icon">
-
-                    {appliance.name
-                      ?.slice(0, 2)
-                      .toUpperCase()}
-
-                  </div>
-
-
-                  <div className="appliance-name">
-
-                    <strong>
-                      {appliance.name}
-                    </strong>
-
-                    <span>
-                      {appliance.category}
-                    </span>
-
-                  </div>
-
-
-                  <div className="appliance-usage">
-
-                    {wattage.toLocaleString()} W
-
-                  </div>
-
-
+                return (
                   <div
-                    className={
-                      appliance.active
-                        ? "appliance-status active-status"
-                        : "appliance-status"
-                    }
+                    className="appliance-row"
+                    key={appliance.id}
                   >
 
-                    {appliance.active
-                      ? "Active"
-                      : "Standby"}
+                    <div className="appliance-icon">
+
+                      {appliance.name
+                        ?.slice(0, 2)
+                        .toUpperCase()}
+
+                    </div>
+
+
+                    <div className="appliance-name">
+
+                      <strong>
+                        {appliance.name}
+                      </strong>
+
+                      <span>
+                        {appliance.category}
+                      </span>
+
+                    </div>
+
+
+                    <div className="appliance-usage">
+
+                      {wattage.toLocaleString()} W
+
+                    </div>
+
+
+                    <div
+                      className={
+                        appliance.active
+                          ? "appliance-status active-status"
+                          : "appliance-status"
+                      }
+                    >
+
+                      {appliance.active
+                        ? "Active"
+                        : "Standby"}
+
+                    </div>
 
                   </div>
-
-                </div>
-              );
-            })}
+                );
+              }
+            )}
 
           </div>
 

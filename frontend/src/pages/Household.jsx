@@ -24,6 +24,7 @@ function Household() {
   });
 
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -32,34 +33,97 @@ function Household() {
         setLoading(true);
         setError("");
 
-        // Get the currently active household
+        // --------------------------------
+        // Active household
+        // --------------------------------
+
         const activeResponse = await API.get(
-          "/api/households/active/"
+          "/households/active/"
         );
 
-        const activeHousehold = activeResponse.data;
+        const activeHousehold =
+          activeResponse.data;
+
+        if (!activeHousehold?.id) {
+          throw new Error(
+            "No active household found."
+          );
+        }
 
         setHousehold(activeHousehold);
 
-        const householdId = activeHousehold.id;
+        const householdId =
+          activeHousehold.id;
 
-        // Get battery data
+        // --------------------------------
+        // Battery
+        // --------------------------------
+
         const batteryResponse = await API.get(
-          `/api/households/${householdId}/batteries/`
+          `/households/${householdId}/batteries/`
         );
 
-        if (batteryResponse.data.length > 0) {
-          setBattery(batteryResponse.data[0]);
+        if (
+          Array.isArray(batteryResponse.data) &&
+          batteryResponse.data.length > 0
+        ) {
+          setBattery(
+            batteryResponse.data[0]
+          );
         }
 
-        // Get electricity supply data
-        const energyResponse = await API.get(
-          `/api/households/${householdId}/energy-supply/`
+        // --------------------------------
+        // Energy Supply
+        //
+        // Backend uses "energysupply/"
+        // and may return 404 if no record
+        // exists yet.
+        // --------------------------------
+
+        try {
+          const energyResponse =
+            await API.get(
+              `/households/${householdId}/energysupply/`
+            );
+
+          setElectricity(
+            energyResponse.data || {
+              id: null,
+              wattage: 0,
+            }
+          );
+        } catch (energyError) {
+          if (
+            energyError.response?.status ===
+            404
+          ) {
+            console.warn(
+              "No EnergySupply configured for this household."
+            );
+
+            setElectricity({
+              id: null,
+              wattage: 0,
+            });
+          } else {
+            throw energyError;
+          }
+        }
+      } catch (err) {
+        console.error(
+          "Failed to load household:",
+          err
         );
 
-        setElectricity(energyResponse.data);
-      } catch (err) {
-        console.error("Failed to load household:", err);
+        console.error(
+          "Response:",
+          err.response?.data
+        );
+
+        console.error(
+          "Request:",
+          err.config?.url
+        );
 
         setError(
           "Unable to load household information."
@@ -72,21 +136,30 @@ function Household() {
     loadHouseholdData();
   }, []);
 
-  const updateHousehold = (field, value) => {
+  const updateHousehold = (
+    field,
+    value
+  ) => {
     setHousehold((current) => ({
       ...current,
       [field]: value,
     }));
   };
 
-  const updateBattery = (field, value) => {
+  const updateBattery = (
+    field,
+    value
+  ) => {
     setBattery((current) => ({
       ...current,
       [field]: Number(value),
     }));
   };
 
-  const updateElectricity = (field, value) => {
+  const updateElectricity = (
+    field,
+    value
+  ) => {
     setElectricity((current) => ({
       ...current,
       [field]: Number(value),
@@ -94,30 +167,46 @@ function Household() {
   };
 
   async function saveChanges() {
+    if (!household.id) {
+      setError(
+        "No household is currently selected."
+      );
+      return;
+    }
+
     try {
+      setSaving(true);
       setError("");
 
-      const householdId = household.id;
+      const householdId =
+        household.id;
 
+      // --------------------------------
       // Update household
+      // --------------------------------
+
       await API.patch(
-        `/api/households/${householdId}/`,
+        `/households/${householdId}/`,
         {
           name: household.name,
           type: household.type,
         }
       );
 
+      // --------------------------------
       // Update battery
+      // --------------------------------
+
       if (battery.id) {
         await API.patch(
-          `/api/households/${householdId}/batteries/${battery.id}/`,
+          `/households/${householdId}/batteries/${battery.id}/`,
           {
             name: battery.name,
             capacity: battery.capacity,
             current_percentage:
               battery.current_percentage,
-            efficiency: battery.efficiency,
+            efficiency:
+              battery.efficiency,
             max_discharge:
               battery.max_discharge,
             active: battery.active,
@@ -125,35 +214,70 @@ function Household() {
         );
       }
 
-      // Update electricity supply
+      // --------------------------------
+      // Update Energy Supply
+      //
+      // Only PATCH if an EnergySupply
+      // record already exists.
+      // --------------------------------
+
       if (electricity.id) {
-        await API.patch(
-          `/api/households/${householdId}/energy-supply/`,
-          {
-            wattage: electricity.wattage,
-          }
+        const response =
+          await API.patch(
+            `/households/${householdId}/energysupply/`,
+            {
+              wattage:
+                electricity.wattage,
+            }
+          );
+
+        setElectricity(
+          response.data
         );
       }
 
-      alert("Changes saved successfully.");
+      alert(
+        "Changes saved successfully."
+      );
     } catch (err) {
-      console.error("Failed to save household:", err);
+      console.error(
+        "Failed to save household:",
+        err
+      );
+
+      console.error(
+        "Response:",
+        err.response?.data
+      );
 
       setError(
         "Unable to save your changes."
       );
+    } finally {
+      setSaving(false);
     }
   }
+
+  // --------------------------------
+  // Loading state
+  // --------------------------------
 
   if (loading) {
     return (
       <div className="page household">
+
         <div className="page-header">
           <div>
-            <h1>Household Settings</h1>
-            <p>Loading your household...</p>
+            <h1>
+              Household Settings
+            </h1>
+
+            <p>
+              Loading your household...
+            </p>
           </div>
         </div>
+
       </div>
     );
   }
@@ -162,16 +286,24 @@ function Household() {
     <div className="page household">
 
       {/* Header */}
+
       <div className="page-header">
+
         <div>
-          <h1>Household Settings</h1>
+          <h1>
+            Household Settings
+          </h1>
 
           <p>
-            Manage your household, battery, and
-            electricity configuration.
+            Manage your household, battery,
+            and electricity configuration.
           </p>
         </div>
+
       </div>
+
+
+      {/* Error */}
 
       {error && (
         <div className="form-error">
@@ -179,23 +311,38 @@ function Household() {
         </div>
       )}
 
-      {/* Household */}
+
+      {/* =========================
+          HOUSEHOLD
+      ========================= */}
+
       <section className="dashboard-card settings-card">
 
         <div className="section-header">
+
           <div>
-            <h2>Household</h2>
+
+            <h2>
+              Household
+            </h2>
 
             <p>
-              Basic information about your household.
+              Basic information about your
+              household.
             </p>
+
           </div>
+
         </div>
+
 
         <div className="settings-grid">
 
           <div className="settings-field">
-            <label>Household Name</label>
+
+            <label>
+              Household Name
+            </label>
 
             <input
               type="text"
@@ -207,10 +354,15 @@ function Household() {
                 )
               }
             />
+
           </div>
 
+
           <div className="settings-field">
-            <label>Household Type</label>
+
+            <label>
+              Household Type
+            </label>
 
             <select
               value={household.type}
@@ -221,6 +373,7 @@ function Household() {
                 )
               }
             >
+
               <option value="single-family">
                 Single Family
               </option>
@@ -236,32 +389,50 @@ function Household() {
               <option value="other">
                 Other
               </option>
+
             </select>
+
           </div>
 
         </div>
 
       </section>
 
-      {/* Battery */}
+
+      {/* =========================
+          BATTERY
+      ========================= */}
+
       <section className="dashboard-card settings-card">
 
         <div className="section-header">
+
           <div>
-            <h2>Battery</h2>
+
+            <h2>
+              Battery
+            </h2>
 
             <p>
-              Configure your household backup battery.
+              Configure your household
+              backup battery.
             </p>
+
           </div>
+
         </div>
+
 
         <div className="settings-grid">
 
           <div className="settings-field">
-            <label>Battery Capacity</label>
+
+            <label>
+              Battery Capacity
+            </label>
 
             <div className="settings-unit-input">
+
               <input
                 type="number"
                 min="0"
@@ -275,19 +446,30 @@ function Household() {
                 }
               />
 
-              <span>kWh</span>
+              <span>
+                kWh
+              </span>
+
             </div>
+
           </div>
 
+
           <div className="settings-field">
-            <label>Current Battery</label>
+
+            <label>
+              Current Battery
+            </label>
 
             <div className="settings-unit-input">
+
               <input
                 type="number"
                 min="0"
                 max="100"
-                value={battery.current_percentage}
+                value={
+                  battery.current_percentage
+                }
                 onChange={(event) =>
                   updateBattery(
                     "current_percentage",
@@ -296,19 +478,30 @@ function Household() {
                 }
               />
 
-              <span>%</span>
+              <span>
+                %
+              </span>
+
             </div>
+
           </div>
 
+
           <div className="settings-field">
-            <label>Inverter Efficiency</label>
+
+            <label>
+              Inverter Efficiency
+            </label>
 
             <div className="settings-unit-input">
+
               <input
                 type="number"
                 min="0"
                 max="100"
-                value={battery.efficiency}
+                value={
+                  battery.efficiency
+                }
                 onChange={(event) =>
                   updateBattery(
                     "efficiency",
@@ -317,19 +510,30 @@ function Household() {
                 }
               />
 
-              <span>%</span>
+              <span>
+                %
+              </span>
+
             </div>
+
           </div>
 
+
           <div className="settings-field">
-            <label>Maximum Discharge</label>
+
+            <label>
+              Maximum Discharge
+            </label>
 
             <div className="settings-unit-input">
+
               <input
                 type="number"
                 min="0"
                 step="0.1"
-                value={battery.max_discharge}
+                value={
+                  battery.max_discharge
+                }
                 onChange={(event) =>
                   updateBattery(
                     "max_discharge",
@@ -338,38 +542,60 @@ function Household() {
                 }
               />
 
-              <span>kW</span>
+              <span>
+                kW
+              </span>
+
             </div>
+
           </div>
 
         </div>
 
       </section>
 
-      {/* Electricity */}
+
+      {/* =========================
+          ELECTRICITY
+      ========================= */}
+
       <section className="dashboard-card settings-card">
 
         <div className="section-header">
+
           <div>
-            <h2>Electricity</h2>
+
+            <h2>
+              Electricity
+            </h2>
 
             <p>
-              Configure your household energy supply.
+              Configure your household
+              energy supply.
             </p>
+
           </div>
+
         </div>
+
 
         <div className="settings-grid">
 
           <div className="settings-field">
-            <label>Energy Supply</label>
+
+            <label>
+              Energy Supply
+            </label>
 
             <div className="settings-unit-input">
+
               <input
                 type="number"
                 min="0"
                 step="0.1"
-                value={electricity.wattage}
+                value={
+                  electricity.wattage
+                }
                 onChange={(event) =>
                   updateElectricity(
                     "wattage",
@@ -378,32 +604,57 @@ function Household() {
                 }
               />
 
-              <span>W</span>
+              <span>
+                W
+              </span>
+
             </div>
+
           </div>
 
         </div>
 
+
+        {!electricity.id && (
+          <p className="card-description">
+            No Energy Supply record exists
+            for this household yet. The value
+            can be displayed, but your current
+            backend only supports PATCH for
+            existing Energy Supply records.
+          </p>
+        )}
+
       </section>
 
-      {/* Appliance information */}
+
+      {/* =========================
+          APPLIANCES
+      ========================= */}
+
       <section className="dashboard-card settings-card">
 
         <div className="section-header">
 
           <div>
-            <h2>Appliance Data</h2>
+
+            <h2>
+              Appliance Data
+            </h2>
 
             <p>
-              Appliance information can be edited
-              from the Simulator.
+              Appliance information can be
+              edited from the Simulator.
             </p>
+
           </div>
+
 
           <button
             className="secondary-button"
             onClick={() =>
-              window.location.href = "/simulator"
+              window.location.href =
+                "/simulator"
             }
           >
             Edit Appliances
@@ -413,14 +664,23 @@ function Household() {
 
       </section>
 
-      {/* Save */}
+
+      {/* =========================
+          SAVE
+      ========================= */}
+
       <div className="settings-footer">
+
         <button
           className="primary-button"
           onClick={saveChanges}
+          disabled={saving}
         >
-          Save Changes
+          {saving
+            ? "Saving..."
+            : "Save Changes"}
         </button>
+
       </div>
 
     </div>

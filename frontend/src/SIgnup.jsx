@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./App.css";
-import API from "../api/api";
+import API from "./api/api";
 
 function Signup({ onLogin }) {
   const [mode, setMode] = useState("signup");
@@ -57,33 +57,22 @@ function Signup({ onLogin }) {
     setSuccess("");
 
     try {
-      /*
-       * Django endpoint:
-       *
-       * POST /api/register/
-       *
-       * API baseURL should be:
-       * http://127.0.0.1:8000/api
-       */
       const response = await API.post("/register/", {
         username,
         email,
         password,
       });
 
-      console.log("Registration successful:", response.data);
+      console.log(
+        "Registration successful:",
+        response.data
+      );
 
       setSuccess(
         response.data?.message ||
           "Account created successfully!"
       );
 
-      /*
-       * Your register endpoint creates the user and
-       * household, but does not return JWT tokens.
-       *
-       * Therefore, send the user to the login screen.
-       */
       setTimeout(() => {
         setMode("login");
         setSuccess("");
@@ -102,7 +91,7 @@ function Signup({ onLogin }) {
         );
       } else {
         setError(
-          "Could not connect to the server. Please make sure the backend is running."
+          "Could not connect to the server."
         );
       }
     } finally {
@@ -116,18 +105,6 @@ function Signup({ onLogin }) {
     setSuccess("");
 
     try {
-      /*
-       * Django endpoint:
-       *
-       * POST /api/login/
-       *
-       * TokenObtainPairView returns:
-       *
-       * {
-       *   "refresh": "...",
-       *   "access": "..."
-       * }
-       */
       const response = await API.post("/login/", {
         username,
         password,
@@ -153,7 +130,7 @@ function Signup({ onLogin }) {
 
       if (!data.access) {
         setError(
-          "Login succeeded, but the server did not return an access token."
+          "Login succeeded, but no access token was returned."
         );
         return;
       }
@@ -171,7 +148,7 @@ function Signup({ onLogin }) {
         );
       } else {
         setError(
-          "Could not connect to the server. Please make sure the backend is running."
+          "Could not connect to the server."
         );
       }
     } finally {
@@ -209,18 +186,14 @@ function Signup({ onLogin }) {
 
         <form onSubmit={handleSubmit}>
 
-          {/* =========================
-              SIGNUP FIELDS
-          ========================= */}
-
           {isSignup && (
             <>
-              <label htmlFor="username">
+              <label htmlFor="signup-username">
                 Username
               </label>
 
               <input
-                id="username"
+                id="signup-username"
                 type="text"
                 placeholder="Choose a username"
                 value={username}
@@ -247,10 +220,6 @@ function Signup({ onLogin }) {
             </>
           )}
 
-          {/* =========================
-              LOGIN USERNAME
-          ========================= */}
-
           {!isSignup && (
             <>
               <label htmlFor="login-username">
@@ -269,10 +238,6 @@ function Signup({ onLogin }) {
               />
             </>
           )}
-
-          {/* =========================
-              PASSWORD
-          ========================= */}
 
           <label htmlFor="password">
             Password
@@ -293,10 +258,6 @@ function Signup({ onLogin }) {
             required
           />
 
-          {/* =========================
-              CONFIRM PASSWORD
-          ========================= */}
-
           {isSignup && (
             <>
               <label htmlFor="confirm-password">
@@ -309,16 +270,14 @@ function Signup({ onLogin }) {
                 placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(event) =>
-                  setConfirmPassword(event.target.value)
+                  setConfirmPassword(
+                    event.target.value
+                  )
                 }
                 required
               />
             </>
           )}
-
-          {/* =========================
-              MESSAGES
-          ========================= */}
 
           {error && (
             <p className="form-error">
@@ -331,10 +290,6 @@ function Signup({ onLogin }) {
               {success}
             </p>
           )}
-
-          {/* =========================
-              SUBMIT
-          ========================= */}
 
           <button
             type="submit"
@@ -351,12 +306,7 @@ function Signup({ onLogin }) {
 
         </form>
 
-        {/* =========================
-            SWITCH LOGIN / SIGNUP
-        ========================= */}
-
         <p className="signup-text">
-
           {isSignup ? (
             <>
               Already have an account?{" "}
@@ -386,7 +336,6 @@ function Signup({ onLogin }) {
               </a>
             </>
           )}
-
         </p>
 
       </div>
