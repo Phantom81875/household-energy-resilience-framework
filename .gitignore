@@ -28,4 +28,3 @@ replay_pid*
 .env
 .venv
 __pycache__
-migrations
