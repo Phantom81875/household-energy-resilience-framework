@@ -31,7 +31,9 @@ SECRET_KEY = 'django-insecure-g%rb)(iasbuls6^gs5-e%1)n!rj_-$*y5afg&h+@m!^%*8&m59
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["household-energy-resilience-framework.onrender.com", "localhost", "127.0.0.1"]
+
+CSRF_TRUSTED_ORIGINS = ["https://household-energy-resilience-framework.onrender.com"]
 
 
 # Application definition
