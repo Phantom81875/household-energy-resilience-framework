@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "/api",
+  baseURL: "https://household-energy-resilience-framework-1.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },
