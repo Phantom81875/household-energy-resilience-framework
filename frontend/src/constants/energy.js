@@ -1,0 +1,1 @@
+export const ELECTRICITY_RATE = 0.16;

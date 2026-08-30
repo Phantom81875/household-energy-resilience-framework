@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
-import dj_database_url
 from dotenv import load_dotenv
 from datetime import timedelta
 
@@ -32,9 +31,7 @@ SECRET_KEY = 'django-insecure-g%rb)(iasbuls6^gs5-e%1)n!rj_-$*y5afg&h+@m!^%*8&m59
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["household-energy-resilience-framework.onrender.com", "localhost", "127.0.0.1"]
-
-CSRF_TRUSTED_ORIGINS = ["https://household-energy-resilience-framework.onrender.com"]
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -86,7 +83,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    "default": dj_database_url.config(default=os.getenv("DATABASE_URL"))
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv("DB_NAME"),
+        'USER': os.getenv("DB_USER"),
+        'PASSWORD': os.getenv("DB_PASSWORD"),
+        'HOST': os.getenv("DB_HOST"),
+        'PORT': os.getenv("DB_PORT"),
+    }
 }
 
 

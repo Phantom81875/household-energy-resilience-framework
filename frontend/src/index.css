@@ -1,0 +1,266 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  background: #f5f5f5;
+  color: #222;
+}
+/* =========================================================
+   STEP 1.5 — AUTHENTICATION SCREEN
+   White + Red Theme
+========================================================= */
+
+.login-page {
+  min-height: 100vh;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f8f8f8;
+
+  padding: 30px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 430px;
+
+  background: #ffffff;
+
+  border: 1px solid #e8e8e8;
+  border-radius: 16px;
+
+  padding: 42px;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.login-card h1 {
+  margin: 0 0 8px;
+
+  color: #222222;
+
+  font-size: 30px;
+  font-weight: 700;
+
+  letter-spacing: -0.5px;
+}
+
+.login-card .subtitle {
+  margin: 0 0 30px;
+
+  color: #777777;
+
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
+/* =========================
+   FORM
+========================= */
+
+.login-card form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-card label {
+  margin-bottom: 7px;
+
+  color: #333333;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.login-card input {
+  width: 100%;
+  height: 46px;
+
+  margin-bottom: 18px;
+
+  padding: 0 13px;
+
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #222222;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.login-card input::placeholder {
+  color: #aaaaaa;
+}
+
+.login-card input:hover {
+  border-color: #cccccc;
+}
+
+.login-card input:focus {
+  border-color: #c62828;
+
+  box-shadow:
+    0 0 0 3px rgba(198, 40, 40, 0.08);
+}
+
+
+/* =========================
+   SUBMIT BUTTON
+========================= */
+
+.login-card button[type="submit"] {
+  width: 100%;
+  height: 46px;
+
+  margin-top: 4px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #c62828;
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease,
+    box-shadow 0.2s ease;
+}
+
+.login-card button[type="submit"]:hover {
+  background: #b71c1c;
+
+  box-shadow:
+    0 4px 12px rgba(198, 40, 40, 0.18);
+}
+
+.login-card button[type="submit"]:active {
+  transform: translateY(1px);
+}
+
+.login-card button[type="submit"]:disabled {
+  background: #d98b8b;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+
+/* =========================
+   ERROR / SUCCESS
+========================= */
+
+.form-error {
+  margin: -5px 0 16px !important;
+
+  padding: 10px 12px;
+
+  border: 1px solid #f0caca;
+  border-radius: 7px;
+
+  background: #fff5f5;
+  color: #b71c1c !important;
+
+  font-size: 12px !important;
+  line-height: 1.4;
+}
+
+.form-success {
+  margin: -5px 0 16px !important;
+
+  padding: 10px 12px;
+
+  border: 1px solid #c8e6c9;
+  border-radius: 7px;
+
+  background: #f5fff5;
+  color: #2e7d32 !important;
+
+  font-size: 12px !important;
+  line-height: 1.4;
+}
+
+
+/* =========================
+   LOGIN / SIGNUP SWITCH
+========================= */
+
+.signup-text {
+  margin: 24px 0 0 !important;
+
+  color: #888888 !important;
+
+  text-align: center;
+
+  font-size: 13px !important;
+}
+
+.signup-text a {
+  color: #c62828;
+
+  font-weight: 600;
+
+  text-decoration: none;
+
+  transition: color 0.2s ease;
+}
+
+.signup-text a:hover {
+  color: #8e0000;
+
+  text-decoration: underline;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 500px) {
+  .login-page {
+    padding: 18px;
+  }
+
+  .login-card {
+    padding: 30px 24px;
+
+    border-radius: 12px;
+  }
+
+  .login-card h1 {
+    font-size: 26px;
+  }
+}
