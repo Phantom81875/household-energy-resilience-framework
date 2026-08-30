@@ -5,7 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import Simulator from "./pages/Simulator";
 import Optimization from "./pages/Optimization";
 import Household from "./pages/Household";
-import Signup from "./Signup";
+import Signup from "./SIgnup";
 
 import "./App.css";
 
