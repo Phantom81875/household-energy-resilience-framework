@@ -38,7 +38,7 @@ class PasswordValidationSerializer(serializers.Serializer):
 class HouseholdsSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Household
-        fields = ["id" ,"name", "type"]
+        fields = ["id" ,"name", "type", "cost"]
 
 class HouseholdActiveSerializer(serializers.ModelSerializer):
     class Meta:

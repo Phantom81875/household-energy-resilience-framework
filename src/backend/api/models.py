@@ -9,6 +9,7 @@ class Household(models.Model):
     )
     name = models.CharField(max_length=100)
     type = models.CharField(max_length=100)
+    cost = models.FloatField(default=0.12)
 
 class ActiveHousehold(models.Model):
     user = models.OneToOneField(
